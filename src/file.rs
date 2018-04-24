@@ -380,6 +380,7 @@ impl PathFile {
     /// assert_eq!(file, file_can);
     /// # Ok(()) } fn main() { try_main().unwrap() }
     /// ```
+    #[cfg(any(windows, unix))]
     pub fn symlink<P: AsRef<Path>>(&self, dst: P) -> Result<PathFile> {
         symlink_file(&self, &dst).map_err(|err| {
             Error::new(

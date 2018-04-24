@@ -18,6 +18,11 @@ use std::ffi::OsString;
 #[cfg(windows)]
 use std::os::windows::ffi::{OsStrExt, OsStringExt};
 
+#[cfg(not(any(unix, windows)))]
+use std::ffi::OsStr;
+#[cfg(not(any(unix, windows)))]
+use std::os::wasm::ffi::OsStrExt;
+
 use super::{PathAbs, PathArc, PathDir, PathFile};
 
 macro_rules! map_err {
@@ -37,7 +42,7 @@ impl PathArc {
         PathArc::from_stfu8(s)
     }
 
-    #[cfg(unix)]
+    #[cfg(not(windows))]
     pub(crate) fn to_stfu8(&self) -> String {
         let bytes = self.as_os_str().as_bytes();
         stfu8::encode_u8(bytes)
@@ -49,7 +54,7 @@ impl PathArc {
         stfu8::encode_u16(&wide)
     }
 
-    #[cfg(unix)]
+    #[cfg(not(windows))]
     pub(crate) fn from_stfu8(s: &str) -> Result<PathArc, stfu8::DecodeError> {
         let raw_path = stfu8::decode_u8(s)?;
         let os_str = OsStr::from_bytes(&raw_path);
@@ -144,7 +149,7 @@ impl<'de> Deserialize<'de> for PathDir {
 mod tests {
     use super::super::{PathDir, PathFile, PathType};
 
-    #[cfg(unix)]
+    #[cfg(not(windows))]
     static SERIALIZED: &str = "[\
                                {\"type\":\"file\",\"path\":\"{0}/foo.txt\"},\
                                {\"type\":\"dir\",\"path\":\"{0}/bar\"},\

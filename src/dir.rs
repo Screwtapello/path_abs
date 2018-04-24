@@ -289,6 +289,7 @@ impl PathDir {
     ///
     /// # Ok(()) } fn main() { try_main().unwrap() }
     /// ```
+    #[cfg(any(windows, unix))]
     pub fn symlink<P: AsRef<Path>>(&self, dst: P) -> Result<PathDir> {
         symlink_dir(&self, &dst).map_err(|err| {
             Error::new(
